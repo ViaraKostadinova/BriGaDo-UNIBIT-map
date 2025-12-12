@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Cars to UNIBIT Real Roads</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<style>
+#map { height: 100vh; width: 100%; }
+</style>
+</head>
+<body>
+<div id="map"></div>
+<script>
+
+// MAP
+const map = L.map('map').setView([42.7, 23.32], 7);
+L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png").addTo(map);
+
+// CAR ICON
+const carIcon = L.icon({
+    iconUrl: "car.png",  // сложи car.png файл в същата папка
+    iconSize: [40, 40],
+    iconAnchor: [20, 20]
+});
+
+// UNIBIT – бул. Христо Смирненски 69A
+const UNIBIT = [42.6577, 23.3869];
+
+// REALISTIC ROUTES
+const routes = {
+    "Dupnica": [
+        [42.2637, 23.1111],[42.2900, 23.1150],[42.3100, 23.1300],[42.3400, 23.1500],
+        [42.3700, 23.1800],[42.4100, 23.2100],[42.4500, 23.2400],[42.4900, 23.2700],
+        [42.5300, 23.3000],[42.5700, 23.3100],[42.6000, 23.3200],[42.6300, 23.3350],
+        UNIBIT
+    ],
+    "Svilengrad": [
+        [41.7667,26.2000],[41.8000,26.1000],[41.8500,26.0000],[41.9200,25.8000],
+        [42.0000,25.4000],[42.0800,25.0000],[42.1500,24.6000],[42.2200,24.2000],
+        [42.3000,23.9000],[42.4000,23.7000],[42.5000,23.5000],[42.5800,23.3500],
+        UNIBIT
+    ],
+    "Pravets": [
+        [42.8871,23.9120],[42.8500,23.8500],[42.8000,23.7000],[42.7500,23.5500],
+        [42.7000,23.4500],[42.6800,23.4000],
+        UNIBIT
+    ],
+    "Gorna Oryahovitsa": [
+        [43.1274,25.7017],[43.0500,25.5000],[42.9500,25.2000],[42.8500,24.5000],
+        [42.7000,23.9000],[42.6500,23.6000],[42.6200,23.4500],
+        UNIBIT
+    ],
+    "Elin Pelin": [
+        [42.6667,23.6000],[42.6600,23.5500],[42.6550,23.5000],[42.6500,23.4600],
+        UNIBIT
+    ]
+};
+
+// ANIMATE CAR ALONG ROUTE
+function animateCar(route, duration) {
+    const marker = L.marker(route[0], {icon: carIcon}).addTo(map);
+    const traveled = L.polyline([], {color:"red", weight:4}).addTo(map);
+
+    const totalPoints = route.length;
+    const interval = duration / totalPoints;
+    let index = 0;
+
+    const move = setInterval(() => {
+        if(index >= totalPoints){
+            clearInterval(move);
+            return;
+        }
+        const pos = route[index];
+        marker.setLatLng(pos);
+        traveled.addLatLng(pos);
+        index++;
+    }, interval);
+}
+
+// START ANIMATION FOR ALL CARS (3 seconds)
+for(const city in routes){
+    animateCar(routes[city], 3000);
+}
+
+// AFTER 3 SECONDS → ZOOM TO UNIBIT
+setTimeout(()=>{
+    map.setView(UNIBIT,17,{animate:true, duration:1.5});
+},3000);
+
+</script>
+</body>
+</html>
